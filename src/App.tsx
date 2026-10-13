@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Icon, type IconName } from './icons';
-import { signIn, signOutUser, watchAuth } from './lib/firebase';
+import { missingConfig, signIn, signOutUser, watchAuth } from './lib/firebase';
 import { initStore, setUser, startSyncLoop, useStore } from './lib/store';
 import { ActivityTab } from './components/ActivityTab';
 import { HistoryTab } from './components/HistoryTab';
@@ -41,6 +41,15 @@ export default function App() {
     return () => { un(); stop(); };
   }, []);
 
+  if (missingConfig.length) {
+    return (
+      <div className="center">
+        <h1 className="serif">Setup needed</h1>
+        <p className="dim">This build is missing: {missingConfig.join(', ')}.</p>
+        <p className="dim sm">Add them under repo Settings → Secrets and variables → Actions → Variables, then re-run the deploy workflow.</p>
+      </div>
+    );
+  }
   if (!s.ready || !s.authReady) return <div className="center dim">Loading…</div>;
   if (!s.user) return <SignIn />;
   if (s.denied) {
